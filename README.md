@@ -17,8 +17,8 @@ sws up <file|folder>... [flags]
 ```
 | Flag                      | Description                                                          |
 | ------------------------- | -------------------------------------------------------------------- |
-| `-p, --password [value]`  | Protect transfer with password.                                      |
-| `-e, --expiration <days>` | Optionally set transfer expiration.                                  |
+| `-p, --password [value]`  | Protect transfer with password. (optional)                           |
+| `-e, --expiration <days>` | Set transfer expiration. (optional, server default if omitted)       |
 
 ### Download
 ```sh
@@ -30,4 +30,4 @@ sws dl <identifier> [flags]
 ```
 | Flag                     | Description                                              |
 | ------------------------ | -------------------------------------------------------- |
-| `-p, --password [value]` | Unlock password-protected transfer. Prompts if no value. |
+| `-p, --password [value]` | Unlock password-protected transfer.                      |
