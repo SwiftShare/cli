@@ -1,6 +1,6 @@
 # SwiftShare CLI
 
-Official CLI for SwiftShare — fast and secure file sharing from your terminal.
+Official CLI for SwiftShare - fast and secure file sharing from your terminal.
 
 [![asciicast](https://asciinema.org/a/SHlOgtddLW4bRShl.svg)](https://asciinema.org/a/SHlOgtddLW4bRShl)
 
@@ -26,6 +26,13 @@ sws --version
 
 On Windows, download `sws-windows-amd64.exe`, rename it to `sws.exe`, and add
 it to a folder listed in your `PATH`.
+
+Windows may show a Microsoft Defender SmartScreen warning because the binary is
+not signed yet and may not have enough download reputation. This does not mean
+the file is unsafe; it means Windows cannot verify the publisher. Binaries are
+distributed only through the official GitHub Releases page for this repository.
+If you downloaded `sws-windows-amd64.exe` from that release, choose
+**More info** and then **Run anyway**.
 
 ## Quick Start
 
@@ -70,7 +77,7 @@ Options:
 
 | Option | Description |
 | --- | --- |
-| `-p, --password` | Prompt for a password before creating the transfer. |
+| `-p, --password` | Prompt for a password before creating and uploading the transfer. |
 | `--password-stdin` | Read the password from standard input. |
 | `-e, --expiration <days>` | Set the expiration in days. If omitted, the server default is used. |
 | `--chunk-concurrency <count>` | Number of chunks uploaded in parallel for the current file. Default: `4`. |
@@ -79,11 +86,12 @@ What to expect:
 
 - Files and folders are supported.
 - Folder structure is preserved.
-- A transfer can contain up to `1000` files.
-- Temporary upload failures are retried automatically.
+- Current SwiftShare transfer limits are checked before the upload starts.
+- If uploads are temporarily disabled, `sws` stops before creating a transfer.
+- Temporary upload chunk failures are retried automatically. If retries keep failing in an interactive terminal, `sws` asks whether to retry again or stop.
 - Progress output includes per-file status, size, duration, and average speed.
-- When the upload finishes, the transfer URL is printed.
-- Pressing `Ctrl+C` starts cleanup and shows a loader while the incomplete transfer is removed.
+- When the upload finishes, `sws` waits for the server to finalize the transfer, then prints the expiration date, password-protection status, and transfer URL.
+- If the upload stops before completion, including after `Ctrl+C` or choosing to stop retrying, `sws` removes the incomplete transfer. `Ctrl+C` shows a cleanup loader while it runs.
 
 ## Download
 
@@ -102,7 +110,6 @@ sws dl abc123 --destination ./downloads
 sws dl abc123 --archive
 sws dl abc123 --archive --archive-name photos.zip
 sws dl abc123 --password
-sws dl abc123 --chunk-concurrency 8
 ```
 
 Options:
@@ -113,19 +120,22 @@ Options:
 | `--password-stdin` | Read the password from standard input. |
 | `--archive` | Download the transfer as a ZIP archive. |
 | `--archive-name <filename>` | Name of the ZIP file. `.zip` is added when needed. |
-| `-d, --destination <dir>` | Directory where files are written. Default: current directory. |
-| `--chunk-concurrency <count>` | Number of chunks downloaded in parallel for the current file. Default: `4`. |
+| `-d, --destination <path>` | Directory where files are written. Default: current directory. |
+| `--chunk-concurrency <count>` | Number of file chunks downloaded in parallel. Default: `4`. |
 
 What to expect:
 
 - A transfer URL or a bare identifier can be used.
+- If downloads are temporarily disabled, `sws` stops before fetching the transfer.
 - If the transfer is still being prepared, `sws` shows `Preparing transfer...` with the API progress percentage when available, then downloads when ready.
 - Folder structure is preserved when downloading files directly.
 - Archive downloads preserve the same folder structure inside the ZIP.
+- For direct downloads, or with `--archive`, `--destination` may be an existing writable special file such as `/dev/null`. Omit `--archive-name` when writing an archive to a special file.
 - Existing output paths are confirmed before replacement.
 - Files are downloaded to temporary paths first, then moved into place when complete.
+- Temporary download chunk failures are retried automatically. If retries keep failing in an interactive terminal, `sws` asks whether to retry again or stop.
 - Completed files are kept if a later file fails.
-- Archive downloads use chunk concurrency too; each file is downloaded first, then added to the ZIP.
+- Archive downloads add each file to the ZIP after it finishes.
 - Pressing `Ctrl+C` starts cleanup and shows a loader while temporary files are removed.
 
 ## Updates
