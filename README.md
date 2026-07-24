@@ -20,9 +20,12 @@ On Linux or macOS, make the downloaded binary executable and install it as
 
 ```sh
 chmod +x sws-linux-amd64
-sudo mv sws-linux-amd64 /usr/local/bin/sws
+mkdir -p ~/.local/bin
+mv sws-linux-amd64 ~/.local/bin/sws
 sws --version
 ```
+
+If `~/.local/bin` is not in your `PATH`, add it before running `sws`.
 
 On Windows, download `sws-windows-amd64.exe`, rename it to `sws.exe`, and add
 it to a folder listed in your `PATH`.
@@ -87,10 +90,14 @@ What to expect:
 - Files and folders are supported.
 - Folder structure is preserved.
 - Current SwiftShare transfer limits are checked before the upload starts.
+- Before upload starts, `sws` prints whether the transfer is password-protected, plus the selected expiration and chunk concurrency settings.
 - If uploads are temporarily disabled, `sws` stops before creating a transfer.
+- If the platform transfer limit has been reached, `sws` stops before uploading files and shows a highlighted message asking you to try again later.
+- Uploads and incomplete-transfer cleanup keep working when switching networks.
+- In an interactive terminal, press `p` during upload to pause or resume chunk uploads.
 - Temporary upload chunk failures are retried automatically. If retries keep failing in an interactive terminal, `sws` asks whether to retry again or stop.
 - Progress output includes per-file status, size, duration, and average speed.
-- When the upload finishes, `sws` waits for the server to finalize the transfer, then prints the expiration date, password-protection status, and transfer URL.
+- When the upload finishes, `sws` waits for the server to finalize the transfer, then prints the file count, total size, password-protection status, expiration date, and transfer URL.
 - If the upload stops before completion, including after `Ctrl+C` or choosing to stop retrying, `sws` removes the incomplete transfer. `Ctrl+C` shows a cleanup loader while it runs.
 
 ## Download
@@ -128,14 +135,16 @@ What to expect:
 - A transfer URL or a bare identifier can be used.
 - If downloads are temporarily disabled, `sws` stops before fetching the transfer.
 - If the transfer is still being prepared, `sws` shows `Preparing transfer...` with the API progress percentage when available, then downloads when ready.
+- Before download starts, `sws` prints the destination, archive name when `--archive` is used, and chunk concurrency settings.
 - Folder structure is preserved when downloading files directly.
 - Archive downloads preserve the same folder structure inside the ZIP.
 - For direct downloads, or with `--archive`, `--destination` may be an existing writable special file such as `/dev/null`. Omit `--archive-name` when writing an archive to a special file.
 - Existing output paths are confirmed before replacement.
 - Files are downloaded to temporary paths first, then moved into place when complete.
+- In an interactive terminal, press `p` during download to pause or resume file, chunk, and archive writes.
 - Temporary download chunk failures are retried automatically. If retries keep failing in an interactive terminal, `sws` asks whether to retry again or stop.
 - Completed files are kept if a later file fails.
-- Archive downloads add each file to the ZIP after it finishes.
+- Archive downloads show when each finished file is being added to the ZIP.
 - Pressing `Ctrl+C` starts cleanup and shows a loader while temporary files are removed.
 
 ## Updates
@@ -145,6 +154,10 @@ What to expect:
 ```sh
 sws self-update
 ```
+
+If `sws` was installed in a protected system directory, run
+`sudo sws self-update` or reinstall it in `~/.local/bin` to update without
+`sudo`.
 
 To skip the automatic update check for one command:
 
