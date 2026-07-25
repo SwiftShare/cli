@@ -2,8 +2,6 @@
 
 Official CLI for SwiftShare - fast and secure file sharing from your terminal.
 
-[![asciicast](https://asciinema.org/a/SHlOgtddLW4bRShl.svg)](https://asciinema.org/a/SHlOgtddLW4bRShl)
-
 ## Installation
 
 Download the latest binary for your platform:
