@@ -81,14 +81,15 @@ Options:
 | `-p, --password` | Prompt for a password before creating and uploading the transfer. |
 | `--password-stdin` | Read the password from standard input. |
 | `-e, --expiration <days>` | Set the expiration in days. If omitted, the server default is used. |
-| `--chunk-concurrency <count>` | Number of chunks uploaded in parallel for the current file. Default: `4`. |
+| `--chunk-concurrency <count>` | Fix the maximum number of chunks uploaded in parallel across files. When omitted, concurrency starts at `4` and adapts automatically up to `32`. |
 
 What to expect:
 
 - Files and folders are supported.
 - Folder structure is preserved.
 - Current SwiftShare transfer limits are checked before the upload starts.
-- Before upload starts, `sws` prints whether the transfer is password-protected, plus the selected expiration and chunk concurrency settings.
+- Before upload starts, `sws` prints whether the transfer is password-protected, plus the selected expiration and chunk concurrency mode.
+- Chunks from several files share the same concurrency pool, so small files can be uploaded in parallel. The pool adapts automatically unless `--chunk-concurrency` sets a fixed limit.
 - If uploads are temporarily disabled, `sws` stops before creating a transfer.
 - If the platform transfer limit has been reached, `sws` stops before uploading files and shows a highlighted message asking you to try again later.
 - Uploads and incomplete-transfer cleanup keep working when switching networks.
@@ -126,14 +127,15 @@ Options:
 | `--archive` | Download the transfer as a ZIP archive. |
 | `--archive-name <filename>` | Name of the ZIP file. `.zip` is added when needed. |
 | `-d, --destination <path>` | Directory where files are written. Default: current directory. |
-| `--chunk-concurrency <count>` | Number of file chunks downloaded in parallel. Default: `4`. |
+| `--chunk-concurrency <count>` | Fix the maximum number of chunks downloaded in parallel across files. When omitted, concurrency starts at `4` and adapts automatically up to `32`. |
 
 What to expect:
 
 - A transfer URL or a bare identifier can be used.
 - If downloads are temporarily disabled, `sws` stops before fetching the transfer.
 - If the transfer is still being prepared, `sws` shows `Preparing transfer...` with the API progress percentage when available, then downloads when ready.
-- Before download starts, `sws` prints the destination, archive name when `--archive` is used, and chunk concurrency settings.
+- Before download starts, `sws` prints the destination, archive name when `--archive` is used, and chunk concurrency mode.
+- Chunks from several files share the same concurrency pool for regular files and archives. The pool adapts automatically unless `--chunk-concurrency` sets a fixed limit.
 - Folder structure is preserved when downloading files directly.
 - Archive downloads preserve the same folder structure inside the ZIP.
 - For direct downloads, or with `--archive`, `--destination` may be an existing writable special file such as `/dev/null`. Omit `--archive-name` when writing an archive to a special file.
